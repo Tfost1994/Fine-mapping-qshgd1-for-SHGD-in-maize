@@ -1,0 +1,155 @@
+---
+title: "Figure 4 - HMF Distribution"
+author: "Tyler L Foster"
+output: html_document
+date: "2024-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+if (!require("lme4")) install.packages("lme4")
+library(lme4)
+
+if (!require("scales")) install.packages("scales")
+library(scales)
+
+if (!require("tidyverse")) install.packages("tidyverse")
+library(tidyverse)
+
+if (!require("dplyr")) install.packages("dplyr")
+library(dplyr)
+
+if (!require("janitor")) install.packages("janitor")
+library(janitor)
+
+if (!require("data.table")) install.packages("data.table")
+library(data.table)
+
+if (!require("stringr")) install.packages("stringr")
+library(stringr)
+
+if (!require("ggpubr")) install.packages("ggpubr")
+library(ggpubr)
+
+if (!require("RColorBrewer")) install.packages("RColorBrewer")
+library(RColorBrewer)
+
+if (!require("ggrepel")) install.packages("ggrepel")
+library(ggrepel)
+
+if (!require("readxl")) install.packages("readxl")
+library(readxl)
+
+if (!require("lme4")) install.packages("lme4")
+library(lme4)
+
+if (!require("ggResidpanel")) install.packages("ggResidpanel")
+library(ggResidpanel)
+
+if (!require("boot")) install.packages("boot")
+library(boot)
+
+if (!require("emmeans")) install.packages("emmeans")
+library(emmeans)
+```
+
+```{r}
+#Read in csv files
+eblues_pollen1<- read.csv("eblues_pollen1.csv")
+eblues_anther1<- read.csv("eblues_anther1.csv")
+eblues_pollen2<- read.csv("eblues_pollen2.csv")
+eblues_anther2<- read.csv("eblues_anther2.csv")
+```
+
+```{r}
+#Convert to percentages for visualization
+eblues_pollen1$HMF_percentage <- inv.logit(eblues_pollen1$emmean)*100
+eblues_pollen2$HMF_percentage <- inv.logit(eblues_pollen2$emmean)*100
+eblues_anther1$HMF_percentage <- inv.logit(eblues_anther1$emmean)*100
+eblues_anther2$HMF_percentage <- inv.logit(eblues_anther2$emmean)*100
+```
+
+```{r}
+#Filter out the parental lines (A427 and Wf9)
+no_parents1 <- eblues_pollen1 %>% filter(!Group %in% c("A427", "Wf9"))
+no_parents2 <- eblues_pollen2 %>% filter(!Group %in% c("A427", "Wf9"))
+no_parents3 <- eblues_anther1 %>% filter(!Group %in% c("A427", "Wf9"))
+no_parents4 <- eblues_anther2 %>% filter(!Group %in% c("A427", "Wf9"))
+```
+
+```{r}
+pollen_1_new<-ggplot(data = no_parents1, aes(x=Group, y=HMF_percentage,  fill = "red")) + 
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.5) + 
+  theme(axis.text.x = element_text(vjust=-.0005, angle = 90)) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank()) +
+  geom_text(aes(label= Tassels), hjust=-.25, angle=90, size=3)+
+  ylab("Haploid Male Fertility (%)") + 
+  xlab("Recombinant Group") +
+  scale_y_continuous(limits = c(0,75)) +
+  theme(plot.title = element_text(hjust =0.5, size = 12)) +
+  ggtitle("HMF BLUEs via Pollen Shedding Capacity Scores 1-5") + 
+  scale_fill_manual(values = "gray0") + theme(legend.position="none") + 
+  theme(axis.title = element_text(size = 10))
+pollen_1_new
+
+pollen_2_new<-ggplot(data = no_parents2, aes(x=Group, y=HMF_percentage,  fill = "red")) + 
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.5) + 
+  theme(axis.text.x = element_text(vjust=-.0005, angle = 90)) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank()) +
+  geom_text(aes(label= Tassels), hjust=-.25, angle=90, size=3)+
+  ylab("Haploid Male Fertility (%)") + 
+  xlab("Recombinant Group") +
+  scale_y_continuous(limits = c(0,75)) +
+  theme(plot.title = element_text(hjust =0.5, size = 12)) +
+  ggtitle("HMF BLUEs via Pollen Shedding Capacity Scores 2-5") + 
+  scale_fill_manual(values = "#C8102E") + theme(legend.position="none") + 
+  theme(axis.title = element_text(size = 10))
+pollen_2_new
+
+anther_1_new<-ggplot(data = no_parents3, aes(x=Group, y=HMF_percentage,  fill = "red")) + 
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.5) + 
+  theme(axis.text.x = element_text(vjust=-.0005, angle = 90)) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank()) +
+  geom_text(aes(label= Tassels), hjust=-.25, angle=90, size=3)+
+  ylab("Haploid Male Fertility (%)") + 
+  xlab("Recombinant Group") +
+  scale_y_continuous(limits = c(0,75)) +
+  theme(plot.title = element_text(hjust =0.5, size = 12)) +
+  ggtitle("HMF BLUEs via Anther Emergence Scores 1-5") + 
+  scale_fill_manual(values = "purple3") + theme(legend.position="none") + 
+  theme(axis.title = element_text(size = 10))
+anther_1_new
+
+anther_2_new<-ggplot(data = no_parents4, aes(x=Group, y=HMF_percentage,  fill = "red")) + 
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.5) + 
+  theme(axis.text.x = element_text(vjust=-.0005, angle = 90)) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank()) +
+  geom_text(aes(label= Tassels), hjust=-.25, angle=90, size=3)+
+  ylab("Haploid Male Fertility (%)") + 
+  xlab("Recombinant Group") +
+  scale_y_continuous(limits = c(0,75)) +
+  theme(plot.title = element_text(hjust =0.5, size = 12)) +
+  ggtitle("HMF BLUEs via Anther Emergence Scores 2-5") + 
+  scale_fill_manual(values = "#3399CC") + theme(legend.position="none") + 
+  theme(axis.title = element_text(size = 10))
+anther_2_new
+```
+
+```{r}
+#Combine all four plots into one figure
+bmp(file="Scores_BLUE_new.bmp",
+    width=10, height = 7, units = "in", res=1000)
+  par(mfrow=c(4,4))
+ggarrange(pollen_1_new, anther_1_new,
+          pollen_2_new, anther_2_new,
+                    ncol = 2,
+                    nrow = 2)
+dev.off()
+```
