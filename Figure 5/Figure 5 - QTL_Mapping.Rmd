@@ -1,0 +1,292 @@
+---
+title: "Figure 5 - QTL Mapping"
+author: "Tyler L Foster"
+output: html_document
+date: "2024-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+if (!require("lme4")) install.packages("lme4")
+library(lme4)
+
+if (!require("scales")) install.packages("scales")
+library(scales)
+
+if (!require("tidyverse")) install.packages("tidyverse")
+library(tidyverse)
+
+if (!require("dplyr")) install.packages("dplyr")
+library(dplyr)
+
+if (!require("janitor")) install.packages("janitor")
+library(janitor)
+
+if (!require("data.table")) install.packages("data.table")
+library(data.table)
+
+if (!require("stringr")) install.packages("stringr")
+library(stringr)
+
+if (!require("ggpubr")) install.packages("ggpubr")
+library(ggpubr)
+
+if (!require("RColorBrewer")) install.packages("RColorBrewer")
+library(RColorBrewer)
+
+if (!require("ggrepel")) install.packages("ggrepel")
+library(ggrepel)
+
+if (!require("readxl")) install.packages("readxl")
+library(readxl)
+
+if (!require("lme4")) install.packages("lme4")
+library(lme4)
+
+if (!require("ggResidpanel")) install.packages("ggResidpanel")
+library(ggResidpanel)
+
+if (!require("boot")) install.packages("boot")
+library(boot)
+
+if (!require("emmeans")) install.packages("emmeans")
+library(emmeans)
+
+if (!require("qtl")) install.packages("qtl")
+library(qtl)
+```
+
+#####################################################################################################
+
+Pollen 1-5 using BLUEs
+
+#####################################################################################################
+
+```{r}
+CIM_P1_5 <- read.cross(format = "csv", file = "Mapping_Pollen1-5_BLUEs.csv",
+                        na.strings = c('NA'), genotypes = c('A','B'))
+CIM_P1_5 <- jittermap(CIM_P1_5)
+```
+
+```{r}
+qtl_prob1 <- calc.genoprob(CIM_P1_5, step=2.5, 
+                error.prob=0.0001, map.function=c("kosambi"),
+                stepwidth=c("fixed"))
+
+qtl_cim1<- sim.geno(qtl_prob1, n.draws=100, step=2.5, 
+                off.end=0, error.prob=0.0001,
+                map.function=c("kosambi"), 
+                stepwidth=c("fixed"))
+
+out.cim1 <- cim(qtl_prob1, pheno.col=2, n.marcovar=1,
+            window=.5, method="hk", error.prob=0.0001,
+            map.function=("kosambi"))
+
+
+CIMthresold1<- cim(qtl_cim1,pheno.col=2,n.marcovar=1,method="hk",
+                imp.method="imp", error.prob=0.0001,
+                map.function="kosambi",n.perm=1000)
+
+CIM1<-summary(CIMthresold1)[1,1]
+plot_hk_CIM1<-plot(CIMthresold1, col=c("blue"))
+abline(plot_hk_CIM1, v=CIMthresold1[1,1],CIMthresold1, col="red", lty=6)
+
+pollen1_5_plot <- plot(out.cim1,chr=c(5), 
+     main=substitute("QTL detected in chromosome 5 by CIM, Transformed Pollen Scores 1-5"),
+     col = c("blue"),
+     cex.main = 0.85,
+     xlim = c(0,2.5),
+     ylab= "LOD",
+     xlab="Position (Mb)",lwd=1)
+abline(h=CIMthresold1[1,1], col="red", lty=6)
+summary(out.cim1)
+```
+
+#####################################################################################################
+
+Pollen 2-5 using BLUEs
+
+#####################################################################################################
+
+```{r}
+CIM_P2_5 <- read.cross(format = "csv", file = "Mapping_Pollen2-5_BLUEs.csv",
+                        na.strings = c('NA'), genotypes = c('A','B'))
+CIM_P2_5 <- jittermap(CIM_P2_5)
+```
+
+```{r}
+qtl_prob2 <- calc.genoprob(CIM_P2_5, step=2.5, 
+                error.prob=0.0001, map.function=c("kosambi"),
+                stepwidth=c("fixed"))
+
+qtl_cim2<- sim.geno(qtl_prob2, n.draws=100, step=2.5, 
+                off.end=0, error.prob=0.0001,
+                map.function=c("kosambi"), 
+                stepwidth=c("fixed"))
+
+out.cim2 <- cim(qtl_prob2, pheno.col=2, n.marcovar=1,
+            window=.5, method="hk", error.prob=0.0001, 
+            map.function=("kosambi"))
+
+
+CIMthresold2<- cim(qtl_cim2,pheno.col=2,n.marcovar=1,method="hk",
+                imp.method="imp", error.prob=0.0001,
+                map.function="kosambi",n.perm=1000)
+
+CIM2<-summary(CIMthresold2)[1,1]
+plot_hk_CIM2<-plot(CIMthresold2, col=c("blue"))
+abline(plot_hk_CIM2, v=CIMthresold2[1,1],CIMthresold2, col="red", lty=6)
+
+pollen2_5_plot <- plot(out.cim2,chr=c(5), 
+     main=substitute("QTL detected on chromosome 5 by CIM, BLUE Pollen Scores 2-5"),
+     col = c("blue"),
+     cex.main = 0.75,
+     xlim = c(0,2.5),
+     ylab= "LOD",
+     xlab="Position (Mb)",lwd=1)
+  abline(h=CIMthresold2[1,1], col="red", lty=6)
+summary(out.cim2)
+```
+
+#####################################################################################################
+
+Anther 1-5 with BLUEs
+
+#####################################################################################################
+
+```{r}
+CIM_A1_5 <- read.cross(format = "csv", file = "Mapping_Anther1-5_BLUEs.csv",
+                        na.strings = c('NA'), genotypes = c('A','B'))
+CIM_A1_5 <- jittermap(CIM_A1_5)
+```
+
+```{r}
+qtl_prob3 <- calc.genoprob(CIM_A1_5, step=2.5, 
+                error.prob=0.0001, map.function=c("kosambi"),
+                stepwidth=c("fixed"))
+
+qtl_cim3 <- sim.geno(qtl_prob3, n.draws=100, step=2.5, 
+                off.end=0, error.prob=0.01,
+                map.function=c("kosambi"), 
+                stepwidth=c("fixed"))
+
+out.cim3 <- cim(qtl_prob3, pheno.col=2, n.marcovar=2.5,
+            window=.5, method="hk", error.prob=0.0001, 
+            map.function=("kosambi"))
+
+
+CIMthresold3 <- cim(qtl_cim3,pheno.col=2,n.marcovar=1,method="hk",
+                imp.method="imp", error.prob=0.05,
+                map.function="kosambi",n.perm=1000)
+
+CIM3<-summary(CIMthresold3)[1,1]
+plot_hk_CIM3<-plot(CIMthresold3, col=c("blue"))
+abline(plot_hk_CIM3, v=CIMthresold3[1,1],CIMthresold3, col="red", lty=6)
+
+anther1_5_plot <- plot(out.cim3,chr=c(5), 
+     main=substitute("QTL detected in chromosome 5 by CIM, Transformed Anther Scores 1-5"),
+     col = c("blue"),
+     cex.main = 0.85,
+     xlim = c(0,2.5),
+     ylab= "LOD",
+     xlab="Position (Mb)",lwd=1)
+abline(h=CIMthresold3[1,1], col="red", lty=6)
+summary(out.cim3)
+```
+
+#####################################################################################################
+
+Anther 2-5 with BLUEs
+
+#####################################################################################################
+
+
+```{r}
+CIM_A2_5 <- read.cross(format = "csv", file = "Mapping_Anther2-5_BLUEs.csv",
+                        na.strings = c('NA'), genotypes = c('A','B'))
+CIM_A2_5 <- jittermap(CIM_A2_5)
+```
+
+```{r}
+qtl_prob4 <- calc.genoprob(CIM_A2_5, step=2.5, 
+                error.prob=0.0001, map.function=c("kosambi"),
+                stepwidth=c("fixed"))
+
+qtl_cim4<- sim.geno(qtl_prob4, n.draws=100, step=2.5, 
+                off.end=0, error.prob=0.0001,
+                map.function=c("kosambi"), 
+                stepwidth=c("fixed"))
+
+out.cim4 <- cim(qtl_prob4, pheno.col=2, n.marcovar=1,
+            window=.5, #method="hk", 
+            error.prob=0.0001, 
+            map.function=("kosambi"))
+
+
+CIMthresold4<- cim(qtl_cim4,pheno.col=2,n.marcovar=1,#method="hk",
+                #imp.method="imp", 
+                error.prob=0.05,
+                map.function="kosambi",n.perm=1000)
+
+CIM4<-summary(CIMthresold4)[1,1]
+plot_hk_CIM4<-plot(CIMthresold4, col=c("blue"))
+abline(plot_hk_CIM4, v=CIMthresold4[1,1],CIMthresold4, col="red", lty=6)
+
+
+anther1_5_plot <- plot(out.cim4,chr=c(5), 
+     main=substitute("QTL detected in chromosome 5 by CIM, Transformed Anther Scores 2-5"),
+     col = c("blue"),
+     cex.main = 0.85,
+     xlim = c(0,2.5),
+     ylab= "LOD",
+     xlab="Position (cM)",lwd=1)
+abline(h=CIMthresold4[1,1], col="red", lty=6)
+summary(out.cim4)
+```
+
+```{r}
+#Combining all QTL plots
+bmp(file="QTL_Plots.bmp",
+    width=8, height = 6, units = "in", res=1000)
+par(mfrow=c(2,2))
+  
+  plot(out.cim1,chr=c(5), 
+     main=substitute("HMF BLUEs via Pollen Scores 1-5"),
+     col = c("blue"),
+     cex.main = 1.25,
+     xlim = c(0,2.5),
+     ylab= "LOD",
+     xlab="Position (cM)",lwd=1)
+  abline(h=CIMthresold1[1,1], col="red", lty=6)
+
+  plot(out.cim2,chr=c(5), 
+     main=substitute("HMF BLUEs via Pollen Scores 2-5"),
+     col = c("blue"),
+     cex.main = 1.25,
+     xlim = c(0,2.5),
+     ylab= "LOD",
+     xlab="Position (cM)",lwd=1)
+  abline(h=CIMthresold2[1,1], col="red", lty=6)
+
+  plot(out.cim3,chr=c(5), 
+     main=substitute("HMF BLUEs via Anther Scores 1-5"),
+     col = c("blue"),
+     cex.main = 1.25,
+     xlim = c(0,2.5),
+     ylab= "LOD",
+     xlab="Position (cM)",lwd=1)
+  abline(h=CIMthresold3[1,1], col="red", lty=6)
+
+  plot(out.cim4,chr=c(5), 
+     main=substitute("HMF BLUEs via Anther Scores 2-5"),
+     col = c("blue"),
+     cex.main = 1.25,
+     xlim = c(0,2.5),
+     ylab= "LOD",
+     xlab="Position (cM)",lwd=1)
+  abline(h=CIMthresold4[1,1], col="red", lty=6)
+dev.off()
+```
