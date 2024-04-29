@@ -1,0 +1,48 @@
+---
+title: "Figure S2 and S3 - Correlations"
+author: "Tyler L Foster"
+output: html_document
+date: "2024-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("ggpubr")
+library("readxl")
+library(PerformanceAnalytics)
+library(psych)
+```
+
+```{r}
+HMF_all <- read_excel("One_Sheet_Correlation_2-5.xlsx")
+```
+
+```{r}
+bmp(file="Correlation_of_HMF_Scores_2-5.bmp",
+    width=10, height = 10, units = "in", res=500)
+pairs.panels(HMF_all[,2:7],
+            pch = 20,
+            method = "pearson", # correlation method
+            main = "Correlation of HMF Scores (Scores 2-5) Across Locations" ,
+            lm = TRUE # show correlation ellipses
+             )
+```
+
+```{r}
+new_cor <- read_excel("HMF_Average_Correlations.xlsx")
+```
+
+```{r}
+bmp(file="HMF_Average_Correlations.bmp",
+    width=10, height = 10, units = "in", res=500)
+pairs.panels(new_cor[,2:5],
+            hist.col = "gold",
+            main = "Correlation of HMF Scores", 
+            method = "pearson", # correlation method
+            lm = TRUE, # show correlation ellipses
+             )
+```
+
