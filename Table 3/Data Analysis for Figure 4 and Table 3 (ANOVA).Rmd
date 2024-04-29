@@ -1,0 +1,128 @@
+---
+title: "Data Analysis and ANOVA"
+author: "Tyler L Foster"
+output: html_document
+date: "2024-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+if (!require("lme4")) install.packages("lme4")
+library(lme4)
+
+if (!require("scales")) install.packages("scales")
+library(scales)
+
+if (!require("tidyverse")) install.packages("tidyverse")
+library(tidyverse)
+
+if (!require("dplyr")) install.packages("dplyr")
+library(dplyr)
+
+if (!require("janitor")) install.packages("janitor")
+library(janitor)
+
+if (!require("data.table")) install.packages("data.table")
+library(data.table)
+
+if (!require("stringr")) install.packages("stringr")
+library(stringr)
+
+if (!require("ggpubr")) install.packages("ggpubr")
+library(ggpubr)
+
+if (!require("RColorBrewer")) install.packages("RColorBrewer")
+library(RColorBrewer)
+
+if (!require("ggrepel")) install.packages("ggrepel")
+library(ggrepel)
+
+if (!require("readxl")) install.packages("readxl")
+library(readxl)
+
+if (!require("lme4")) install.packages("lme4")
+library(lme4)
+
+if (!require("ggResidpanel")) install.packages("ggResidpanel")
+library(ggResidpanel)
+
+if (!require("boot")) install.packages("boot")
+library(boot)
+
+if (!require("emmeans")) install.packages("emmeans")
+library(emmeans)
+```
+
+```{r}
+#Read in excel files
+P.BLUEs1 <- read_excel("Raw_Scores_1-5.xlsx", sheet = "Pollen")
+P.BLUEs1
+
+P.BLUEs2 <- read_excel("Raw_Scores_2-5.xlsx", sheet = "Pollen")
+P.BLUEs2
+
+A.BLUEs1 <- read_excel("Raw_Scores_1-5.xlsx", sheet = "Anther")
+A.BLUEs1
+
+A.BLUEs2 <- read_excel("Raw_Scores_2-5.xlsx", sheet = "Anther")
+A.BLUEs2
+```
+
+```{r}
+#Change from character to factor variable
+P.BLUEs1$Environment <- as.factor(P.BLUEs1$Environment)
+P.BLUEs1$Group <- as.factor(P.BLUEs1$Group)
+
+P.BLUEs2$Environment <- as.factor(P.BLUEs2$Environment)
+P.BLUEs2$Group <- as.factor(P.BLUEs2$Group)
+
+A.BLUEs1$Environment <- as.factor(A.BLUEs1$Environment)
+A.BLUEs1$Group <- as.factor(A.BLUEs1$Group)
+
+A.BLUEs2$Environment <- as.factor(A.BLUEs2$Environment)
+A.BLUEs2$Group <- as.factor(A.BLUEs2$Group)
+```
+
+```{r}
+#Creating new column in dataset based on logit transformation
+P.BLUEs1$logit <- logit(P.BLUEs1$HMF_plus_0.005)
+P.BLUEs2$logit <- logit(P.BLUEs2$HMF_plus_0.005)
+A.BLUEs1$logit <- logit(A.BLUEs1$HMF_plus_0.005)
+A.BLUEs2$logit <- logit(A.BLUEs2$HMF_plus_0.005)
+```
+
+```{r}
+#Linear models
+linear_pollen1 <-lm(logit ~ Environment + Group, data = P.BLUEs1)
+linear_pollen2 <-lm(logit ~ Environment + Group, data = P.BLUEs2)
+linear_anther1 <-lm(logit ~ Environment + Group, data = A.BLUEs1)
+linear_anther2 <-lm(logit ~ Environment + Group, data = A.BLUEs2)
+```
+
+```{r}
+eblues_pollen1 <- data.frame(emmeans(linear_pollen1, "Group"))
+eblues_pollen2 <- data.frame(emmeans(linear_pollen2, "Group"))
+eblues_anther1 <- data.frame(emmeans(linear_anther1, "Group"))
+eblues_anther2 <- data.frame(emmeans(linear_anther2, "Group"))
+```
+
+```{r}
+#Visualization of residuals
+resid_panel(linear_pollen1)
+resid_panel(linear_pollen2)
+resid_panel(linear_anther1)
+resid_panel(linear_anther2)
+```
+
+```{r}
+#Anovas
+anova(linear_anther1)
+anova(linear_pollen1)
+anova(linear_anther2)
+anova(linear_pollen2)
+```
+```
+
